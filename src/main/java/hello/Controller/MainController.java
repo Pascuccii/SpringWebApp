@@ -1,8 +1,10 @@
-package hello;
+package hello.Controller;
 
 import hello.domain.Message;
+import hello.domain.User;
 import hello.repos.MessageRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-public class GreetingController {
+public class MainController {
     @Autowired
     private MessageRepo messageRepo;
 
@@ -31,11 +33,13 @@ public class GreetingController {
     }
 
     @PostMapping("/main")
-    public String add(@RequestParam String text,
-                      @RequestParam String tag,
-                      Map<String, Object> model)
+    public String add(
+            @AuthenticationPrincipal User user,
+            @RequestParam String text,
+            @RequestParam String tag,
+            Map<String, Object> model)
     {
-        Message message = new Message(text, tag);
+        Message message = new Message(text, tag, user);
         messageRepo.save(message);
 
         Iterable<Message> messages = messageRepo.findAll();
